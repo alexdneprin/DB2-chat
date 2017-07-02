@@ -9,15 +9,19 @@
 import UIKit
 import Alamofire
 import AlamofireImage
+import JSQMessagesViewController
 
 class NetworkManager: NSObject {
     
     var channels = [Channel]()
     var messages = [Message]()
+    var jsqMessages = [JSQMessage]()
     
     let baseURL: String = "http://ec2-34-211-67-136.us-west-2.compute.amazonaws.com/api/"
     
-    public func getChanelInfo(completionBlock: @escaping([Channel]) -> ()){
+    var totalUnreadMessageCount: NSInteger = 0
+
+    public func getChanelInfo(completionBlock: @escaping([Channel], NSInteger) -> ()){
         Alamofire.request(baseURL+"chat/channels/").responseJSON { (response: DataResponse<Any>) in
             
             guard response.result.isSuccess else {
@@ -35,14 +39,12 @@ class NetworkManager: NSObject {
                 self.parceChanelsJSON(inputJSON: resultJSON)
             }
             
-            completionBlock(self.channels)
+            completionBlock(self.channels, self.totalUnreadMessageCount)
         }
     }
     
-    public func getMessageInfo(userIdentifier: NSInteger, completionBlock: @escaping([Message]) -> ()){
-        Alamofire.request(baseURL+"/chat/channels/" + String(userIdentifier) + "/messages/" ).responseJSON { (response) in
-            
-            print(response)
+    public func getMessageInfo(userIdentifier: String, completionBlock: @escaping([Message],[JSQMessage]) -> ()){
+        Alamofire.request(baseURL+"/chat/channels/" + userIdentifier + "/messages/" ).responseJSON { (response) in
             
             guard response.result.isSuccess else {
                 print("Error while fetching data: \(String(describing: response.result.error))")
@@ -59,13 +61,12 @@ class NetworkManager: NSObject {
                 self.parceMessagesJSON(inputJSON: resultJSON)
             }
             
-            completionBlock(self.messages)
-            
+            completionBlock(self.messages, self.jsqMessages)
         }
-        
     }
     
     func parceChanelsJSON(inputJSON: [[String: Any]]) -> (){
+        
         
         for object in inputJSON {
             
@@ -73,6 +74,10 @@ class NetworkManager: NSObject {
             
             channel.id = object["id"] as! NSInteger
             channel.unreadCount = object["unread_messages_count"] as! NSInteger
+            
+            if channel.unreadCount != 0{
+                self.totalUnreadMessageCount += 1
+            }
             
             if let lastMessage = object["last_message"] as! NSDictionary?{
                 channel.createdDate = lastMessage["create_date"] as! String
@@ -97,6 +102,7 @@ class NetworkManager: NSObject {
         for object in inputJSON {
             
             let message = Message()
+            let jsqMessage: JSQMessage
             
             message.isRead = object["is_read"] as! Bool
             message.createDate = object["create_date"] as! String
@@ -109,15 +115,12 @@ class NetworkManager: NSObject {
                 message.lastName = sender["last_name"] as! String
                 message.photo = sender["photo"] as! String
                 message.userName = sender["username"] as! String
-                
-                print(message.id)
-                print(message.firstName)
-                print(message.lastName)
-                print(message.photo)
-                print(message.userName)
 
+                
+            jsqMessage = JSQMessage.init(senderId: String(describing: sender["id"]!), displayName: sender["username"] as! String, text: object["text"] as! String)
+                self.jsqMessages.append(jsqMessage)
             }
-            
+
             self.messages.append(message)
         }
         

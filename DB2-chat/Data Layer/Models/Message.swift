@@ -20,7 +20,5 @@ class Message {
     var id: NSInteger = 0
     var photo: String = ""
     var userName: String = ""
-    
-//    var senderID: String = ""
-//    var senderDisplayName: String = ""
+
 }

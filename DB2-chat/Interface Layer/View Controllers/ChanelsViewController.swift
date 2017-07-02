@@ -21,39 +21,45 @@ class ChannelsViewController: UIViewController, UITableViewDataSource, UITableVi
     var channels = [Channel]()
     var leftUtilityButtons: NSMutableArray = []
     
-    
-    //    var unreadMessagesCount: NSInteger = 0
-    
+    var totalUnreadMessageCount: NSInteger = 0
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+
+        networkManager.getChanelInfo { (channels, totalUnreadMessageCount) in
+            self.channels = channels
+            self.totalUnreadMessageCount = totalUnreadMessageCount
+            
+            print(self.totalUnreadMessageCount)
+            
+            OperationQueue.main.addOperation({ () -> Void in
+                
+                self.tableView.reloadData()
+                self.dialogsWithUnreadMessagesLabel.text = String(self.totalUnreadMessageCount)
+            })
+        }
+        
+    }
+    
+    override func  viewWillAppear(_ animated: Bool) {
+        super .viewWillAppear(true)
         
         chatTypeSegmentControll.titles = ["Chat", "Live Chat"]
         chatTypeSegmentControll.titleFont = UIFont.init(name: "HelveticaNeue", size: 13)!
         chatTypeSegmentControll.selectedTitleFont = UIFont.init(name: "HelveticaNeue", size: 13)!
-        dialogsWithUnreadMessagesLabel.text = "2"
+        
         dialogsWithUnreadMessagesLabel.layer.cornerRadius = dialogsWithUnreadMessagesLabel.frame.height/2
         dialogsWithUnreadMessagesLabel.layer.masksToBounds = true
-
+        
         navigationController?.navigationBar.barTintColor = UIColor.lightBlueColor()
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
         navigationController?.navigationBar.isTranslucent = false
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
         navigationController?.navigationBar.shadowImage = UIImage()
         
-
-        
-        networkManager.getChanelInfo { (channels) in
-            self.channels = channels
-            OperationQueue.main.addOperation({ () -> Void in
-                self.tableView.reloadData()
-            })
-        }
-        
-
-        
-        
     }
-    
+
     
     //MARK: - NavigationBar Actions
 
@@ -63,10 +69,7 @@ class ChannelsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @IBAction func rightBarButtonItemPressed(_ sender: Any) {
         self.showMessage(message: "Write new message button pressed", userResponce: "I know")
-
     }
-    
-    
 }
 
 
@@ -79,28 +82,28 @@ extension ChannelsViewController{
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        switch section {
-//        case 1:
-//            return self.unreadMessagesCount
-//        case 2:
-//            return channels.count - unreadMessagesCount
-//        default:
-//            break
-//        }
+        switch section {
+        case 0:
+            return self.totalUnreadMessageCount
+        case 1:
+            return channels.count - self.totalUnreadMessageCount
+        default:
+            break
+        }
         return channels.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! ChannelsTableViewCell
         
         cell.userNameLabel.text = self.channels[indexPath.row].firstName + " " + self.channels[indexPath.row].lastName
         cell.messageLabel.text = self.channels[indexPath.row].lastMessageText
         cell.timeLabel.text = self.channels[indexPath.row].createdDate
-        
         cell.unreadMessagesCountLabel.text = String(self.channels[indexPath.row].unreadCount)
-
         
+
         
         if cell.unreadMessagesCountLabel.text == "0"{
             cell.unreadMessagesCountLabel.isHidden = true
@@ -108,7 +111,7 @@ extension ChannelsViewController{
             cell.unreadMessagesCountLabel.isHidden = false
         }
         
-        if let imageName = channels[indexPath.row].photo{
+        if let imageName = channels[indexPath.row].photo as? String {
             self.networkManager.getImage(imageName: imageName) { (image) in
                 cell.avatarImageView?.image = image
                 cell.setNeedsLayout()
@@ -150,6 +153,8 @@ extension ChannelsViewController{
         let viewController = storyboard.instantiateViewController(withIdentifier: "ChatViewControllerID") as! ChatViewController
         
         viewController.userIdentifier = String(indexPath.row)
+        viewController.avatarAdress = channels[indexPath.row].photo
+        viewController.controllerTitleText = channels[indexPath.row].firstName + " " + channels[indexPath.row].lastName
         navigationController?.pushViewController(viewController, animated: true)
     }
     
