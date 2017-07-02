@@ -159,7 +159,7 @@ extension ChatViewController {
         }
         
         cell.textView.font = UIFont(name: "HelveticaNeue", size: 14)
-        cell.textView.textContainerInset = UIEdgeInsetsMake(12, 22, 12, 22) //! This can be realized with an observer content size. I`m sorry
+        cell.textView.textContainerInset = UIEdgeInsetsMake(12, 20, 12, 20) //! This can be realized with an observer content size. I`m sorry
         
         return cell;
     }

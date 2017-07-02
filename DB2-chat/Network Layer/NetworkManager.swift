@@ -20,6 +20,8 @@ class NetworkManager: NSObject {
     
     let baseURL: String = "http://ec2-34-211-67-136.us-west-2.compute.amazonaws.com/api/"
     
+    //MARK: - Requests Functions
+
     public func getChanelInfo(completionBlock: @escaping([[Channel]]) -> ()){
         Alamofire.request(baseURL+"chat/channels/").responseJSON { (response: DataResponse<Any>) in
             
@@ -37,7 +39,7 @@ class NetworkManager: NSObject {
             }
                         
             if let resultJSON = responseJSON["channels"] as? [[String:Any]] {
-                self.parceChanelsJSON(inputJSON: resultJSON)
+                self.parsingChanelsJSON(inputJSON: resultJSON)
             }
             
             self.sortedChanelsData[0].remove(at: 0)
@@ -62,14 +64,16 @@ class NetworkManager: NSObject {
             }
             
             if let resultJSON = responseJSON["messages"] as? [[String:Any]] {
-                self.parceMessagesJSON(inputJSON: resultJSON)
+                self.parsingMessagesJSON(inputJSON: resultJSON)
             }
             
             completionBlock(self.messages, self.jsqMessages)
         }
     }
     
-    func parceChanelsJSON(inputJSON: [[String: Any]]) -> (){
+    //MARK: - JSON Parsing Functions
+
+    func parsingChanelsJSON(inputJSON: [[String: Any]]) -> (){
         
         for object in inputJSON {
             
@@ -100,7 +104,7 @@ class NetworkManager: NSObject {
         }
     }
     
-    func parceMessagesJSON(inputJSON: [[String: Any]]) -> (){
+    func parsingMessagesJSON(inputJSON: [[String: Any]]) -> (){
         
         for object in inputJSON {
             

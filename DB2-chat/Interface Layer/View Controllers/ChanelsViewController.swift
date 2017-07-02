@@ -101,21 +101,24 @@ extension ChannelsViewController{
         cell.messageLabel.text = sortedChanelsData[indexPath.section][indexPath.row].lastMessageText
         cell.userNameLabel.text = (sortedChanelsData[indexPath.section][indexPath.row].firstName) + " " + (sortedChanelsData[indexPath.section][indexPath.row].lastName)
         
-        cell.timeLabel.text = sortedChanelsData[indexPath.section][indexPath.row].createdDate
+        
+        //! The date must be in the correct format
+        
+        let currentTime = sortedChanelsData[indexPath.section][indexPath.row].createdDate.slice(from: "T", to: ".")
+        cell.timeLabel.text = currentTime
         
         cell.unreadMessagesCountLabel.text = String(describing: sortedChanelsData[indexPath.section][indexPath.row].unreadCount)
+
+        let imageName = sortedChanelsData[indexPath.section][indexPath.row].photo
+        self.networkManager.getImage(imageName: imageName) { (image) in
+            cell.avatarImageView?.image = image
+            cell.setNeedsLayout()
+        }
         
         if cell.unreadMessagesCountLabel.text == "0"{
             cell.unreadMessagesCountLabel.isHidden = true
         } else {
             cell.unreadMessagesCountLabel.isHidden = false
-        }
-        
-        let imageName = sortedChanelsData[indexPath.section][indexPath.row].photo
-        
-        self.networkManager.getImage(imageName: imageName) { (image) in
-            cell.avatarImageView?.image = image
-            cell.setNeedsLayout()
         }
         
         fillArrayCellActions()
