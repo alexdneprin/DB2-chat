@@ -47,16 +47,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
+//MARK: - All Extensions (Instead of base classes)
+
 extension UIApplication {
+    
     var statusBarView: UIView? {
         return value(forKey: "statusBar") as? UIView
     }
 }
 
 extension Date {
+    
     func toString() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMMM dd yyyy"
         return dateFormatter.string(from: self)
+    }
+}
+
+extension UIViewController {
+    
+    func showMessage(message: String, userResponce: String){
+        let alert = UIAlertController(title: message, message: "", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: userResponce, style: UIAlertActionStyle.default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
 }

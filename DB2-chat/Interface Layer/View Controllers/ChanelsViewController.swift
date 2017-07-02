@@ -18,25 +18,22 @@ class ChannelsViewController: UIViewController, UITableViewDataSource, UITableVi
     @IBOutlet weak var dialogsWithUnreadMessagesLabel: UILabel!
     
     var networkManager = NetworkManager()
-    var channels = [Channel]()
+    
+    var sortedChanelsData = [[Channel]]()
+    
     var leftUtilityButtons: NSMutableArray = []
     
     var totalUnreadMessageCount: NSInteger = 0
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
 
-        networkManager.getChanelInfo { (channels, totalUnreadMessageCount) in
-            self.channels = channels
-            self.totalUnreadMessageCount = totalUnreadMessageCount
-            
-            print(self.totalUnreadMessageCount)
+        networkManager.getChanelInfo { (sortedChanelsData) in
+            self.sortedChanelsData = sortedChanelsData
             
             OperationQueue.main.addOperation({ () -> Void in
-                
                 self.tableView.reloadData()
-                self.dialogsWithUnreadMessagesLabel.text = String(self.totalUnreadMessageCount)
+                self.dialogsWithUnreadMessagesLabel.text = String(describing: sortedChanelsData[0].count)
             })
         }
         
@@ -62,7 +59,7 @@ class ChannelsViewController: UIViewController, UITableViewDataSource, UITableVi
 
     
     //MARK: - NavigationBar Actions
-
+    
     @IBAction func leftBarButtonItemPressed(_ sender: Any) {
         self.showMessage(message: "Back button pressed", userResponce: "I know")
     }
@@ -82,28 +79,31 @@ extension ChannelsViewController{
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch section {
-        case 0:
-            return self.totalUnreadMessageCount
-        case 1:
-            return channels.count - self.totalUnreadMessageCount
-        default:
-            break
+        
+        if sortedChanelsData.count != 0{
+            switch section {
+            case 0:
+                return sortedChanelsData[0].count
+            case 1:
+                return sortedChanelsData[1].count
+            default:
+                break
+            }
         }
-        return channels.count
+        
+        return 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! ChannelsTableViewCell
         
-        cell.userNameLabel.text = self.channels[indexPath.row].firstName + " " + self.channels[indexPath.row].lastName
-        cell.messageLabel.text = self.channels[indexPath.row].lastMessageText
-        cell.timeLabel.text = self.channels[indexPath.row].createdDate
-        cell.unreadMessagesCountLabel.text = String(self.channels[indexPath.row].unreadCount)
+        cell.messageLabel.text = sortedChanelsData[indexPath.section][indexPath.row].lastMessageText
+        cell.userNameLabel.text = (sortedChanelsData[indexPath.section][indexPath.row].firstName) + " " + (sortedChanelsData[indexPath.section][indexPath.row].lastName)
         
-
+        cell.timeLabel.text = sortedChanelsData[indexPath.section][indexPath.row].createdDate
+        
+        cell.unreadMessagesCountLabel.text = String(describing: sortedChanelsData[indexPath.section][indexPath.row].unreadCount)
         
         if cell.unreadMessagesCountLabel.text == "0"{
             cell.unreadMessagesCountLabel.isHidden = true
@@ -111,16 +111,12 @@ extension ChannelsViewController{
             cell.unreadMessagesCountLabel.isHidden = false
         }
         
-        if let imageName = channels[indexPath.row].photo as? String {
-            self.networkManager.getImage(imageName: imageName) { (image) in
-                cell.avatarImageView?.image = image
-                cell.setNeedsLayout()
-            }
-        }
+        let imageName = sortedChanelsData[indexPath.section][indexPath.row].photo
         
-//        if channels[indexPath.row].isRead == false {
-//            self.unreadMessagesCount += 1
-//        }
+        self.networkManager.getImage(imageName: imageName) { (image) in
+            cell.avatarImageView?.image = image
+            cell.setNeedsLayout()
+        }
         
         fillArrayCellActions()
         cell.delegate = self
@@ -129,7 +125,7 @@ extension ChannelsViewController{
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 68
+        return 69
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -153,11 +149,14 @@ extension ChannelsViewController{
         let viewController = storyboard.instantiateViewController(withIdentifier: "ChatViewControllerID") as! ChatViewController
         
         viewController.userIdentifier = String(indexPath.row)
-        viewController.avatarAdress = channels[indexPath.row].photo
-        viewController.controllerTitleText = channels[indexPath.row].firstName + " " + channels[indexPath.row].lastName
+        viewController.avatarAdress = sortedChanelsData[indexPath.section][indexPath.row].photo
+        viewController.controllerTitleText = sortedChanelsData[indexPath.section][indexPath.row].firstName + " " + sortedChanelsData[indexPath.section][indexPath.row].lastName
         navigationController?.pushViewController(viewController, animated: true)
     }
     
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 10
+    }
 }
 
 
@@ -180,14 +179,6 @@ extension ChannelsViewController: SWTableViewCellDelegate{
     }
 }
 
-//MARK: - UIViewController extensions
 
-extension UIViewController {
-    
-    func showMessage(message: String, userResponce: String){
-        let alert = UIAlertController(title: message, message: "", preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: userResponce, style: UIAlertActionStyle.default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
-    }
-}
+
 

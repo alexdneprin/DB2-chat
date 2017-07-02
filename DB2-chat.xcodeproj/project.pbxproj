@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		113BB25F1F06B2A300F90AC9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113BB25E1F06B2A300F90AC9 /* AppDelegate.swift */; };
-		113BB2611F06B2A300F90AC9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113BB2601F06B2A300F90AC9 /* ViewController.swift */; };
 		113BB2641F06B2A300F90AC9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 113BB2621F06B2A300F90AC9 /* Main.storyboard */; };
 		113BB2661F06B2A300F90AC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 113BB2651F06B2A300F90AC9 /* Assets.xcassets */; };
 		113BB2691F06B2A300F90AC9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 113BB2671F06B2A300F90AC9 /* LaunchScreen.storyboard */; };
@@ -27,7 +26,6 @@
 /* Begin PBXFileReference section */
 		113BB25B1F06B2A300F90AC9 /* DB2-chat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DB2-chat.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		113BB25E1F06B2A300F90AC9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		113BB2601F06B2A300F90AC9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		113BB2631F06B2A300F90AC9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		113BB2651F06B2A300F90AC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		113BB2681F06B2A300F90AC9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -83,7 +81,6 @@
 				117166C91F079FDF00E3EB74 /* Network Layer */,
 				113BB2741F06DC1300F90AC9 /* Interface Layer */,
 				113BB25E1F06B2A300F90AC9 /* AppDelegate.swift */,
-				113BB2601F06B2A300F90AC9 /* ViewController.swift */,
 				113BB2621F06B2A300F90AC9 /* Main.storyboard */,
 				113BB2651F06B2A300F90AC9 /* Assets.xcassets */,
 				113BB2671F06B2A300F90AC9 /* LaunchScreen.storyboard */,
@@ -296,7 +293,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				113BB2611F06B2A300F90AC9 /* ViewController.swift in Sources */,
 				117166C81F07866400E3EB74 /* ChannelsTableViewCell.swift in Sources */,
 				113BB25F1F06B2A300F90AC9 /* AppDelegate.swift in Sources */,
 				117166CB1F07A32B00E3EB74 /* NetworkManager.swift in Sources */,

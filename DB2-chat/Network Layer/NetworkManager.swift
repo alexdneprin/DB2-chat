@@ -13,16 +13,17 @@ import JSQMessagesViewController
 
 class NetworkManager: NSObject {
     
-    var channels = [Channel]()
-    var messages = [Message]()
+    var messages = [Message]() // This class contains values that may be useful
+    
     var jsqMessages = [JSQMessage]()
+    var sortedChanelsData = [[Channel]]()
     
     let baseURL: String = "http://ec2-34-211-67-136.us-west-2.compute.amazonaws.com/api/"
     
-    var totalUnreadMessageCount: NSInteger = 0
-
-    public func getChanelInfo(completionBlock: @escaping([Channel], NSInteger) -> ()){
+    public func getChanelInfo(completionBlock: @escaping([[Channel]]) -> ()){
         Alamofire.request(baseURL+"chat/channels/").responseJSON { (response: DataResponse<Any>) in
+            
+            self.sortedChanelsData = [[Channel()], [Channel()]] // init array
             
             guard response.result.isSuccess else {
                 print("Error while fetching data: \(String(describing: response.result.error))")
@@ -39,7 +40,10 @@ class NetworkManager: NSObject {
                 self.parceChanelsJSON(inputJSON: resultJSON)
             }
             
-            completionBlock(self.channels, self.totalUnreadMessageCount)
+            self.sortedChanelsData[0].remove(at: 0)
+            self.sortedChanelsData[1].remove(at: 0)
+
+            completionBlock(self.sortedChanelsData)
         }
     }
     
@@ -67,18 +71,13 @@ class NetworkManager: NSObject {
     
     func parceChanelsJSON(inputJSON: [[String: Any]]) -> (){
         
-        
         for object in inputJSON {
             
             let channel = Channel()
             
             channel.id = object["id"] as! NSInteger
             channel.unreadCount = object["unread_messages_count"] as! NSInteger
-            
-            if channel.unreadCount != 0{
-                self.totalUnreadMessageCount += 1
-            }
-            
+
             if let lastMessage = object["last_message"] as! NSDictionary?{
                 channel.createdDate = lastMessage["create_date"] as! String
                 channel.isRead = lastMessage["is_read"] as! Bool
@@ -93,7 +92,11 @@ class NetworkManager: NSObject {
                 }
             }
             
-            self.channels.append(channel)
+            if channel.unreadCount != 0 {
+                self.sortedChanelsData[0].append(channel)
+            } else {
+                self.sortedChanelsData[1].append(channel)
+            }
         }
     }
     
@@ -106,16 +109,11 @@ class NetworkManager: NSObject {
             
             message.isRead = object["is_read"] as! Bool
             message.createDate = object["create_date"] as! String
-            message.text = object["text"] as! String
             
             if let sender = object["sender"] as! NSDictionary?{
                 
-                message.id = sender["id"] as! NSInteger
-                message.firstName = sender["first_name"] as! String
-                message.lastName = sender["last_name"] as! String
                 message.photo = sender["photo"] as! String
                 message.userName = sender["username"] as! String
-
                 
             jsqMessage = JSQMessage.init(senderId: String(describing: sender["id"]!), displayName: sender["username"] as! String, text: object["text"] as! String)
                 self.jsqMessages.append(jsqMessage)
@@ -139,7 +137,5 @@ class NetworkManager: NSObject {
             completionBlock(image)
         }
     }
-    
-
     
 }

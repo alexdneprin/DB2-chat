@@ -15,7 +15,6 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     
     var jsqMessages = [JSQMessage]()
     
-    var messages = [Message]()
     var avatar = UIImage.init()
     
     var avatarAdress: String = ""
@@ -45,11 +44,14 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         
         controllerInterfaceSetup()
     }
-        
+    
+    
     func controllerInterfaceSetup(){
         
-        inputToolbar.contentView.rightBarButtonItemWidth = 50
+        inputToolbar.contentView.rightBarButtonItemWidth = 45
         inputToolbar.contentView.rightBarButtonItem.setImage(UIImage(named: "photo-image"), for: .normal)
+
+        inputToolbar.contentView.rightBarButtonItem.setImage(UIImage(named: "photo-image"), for: .disabled)
         
         
         inputToolbar.contentView.leftBarButtonItem = nil
@@ -57,6 +59,10 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         inputToolbar.contentView.textView.layer.borderWidth = 0
         inputToolbar.contentView.textView.placeHolder = "Message..."
         inputToolbar.contentView.textView.textColor = UIColor.lightGray
+        
+        inputToolbar.contentView.textView.autocorrectionType = .yes
+        inputToolbar.contentView.textView.autocorrectionType = .no
+        
         inputToolbar.contentView.textView.font = UIFont(name: "HelveticaNeue", size: 15)
         inputToolbar.layer.borderWidth = 0
         
@@ -86,31 +92,37 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         showMessage(message: "Block button pressed", userResponce: "I know")
     }
     
+    
+    //MARK: - User Actions
+
+    
     @IBAction func backBtn(_ sender: Any) {
         dismiss(animated: true, completion: nil);
     }
+    
+    override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
+        
+        showMessage(message: "Add photo button was pressed", userResponce: "I know")
+    }
+
 }
 
 
+//MARK: - UICollectionView Delegate & Data Sourse Functions
+
 extension ChatViewController {
-    
-    // COLLECTION VIEW FUNCTIONS
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
         
         let bubbleFactory = JSQMessagesBubbleImageFactory()
-//        let imagee = JSQMessagesBubbleImage.init(messageBubble: UIImage(named: "photo-image")!, highlightedImage: (UIImage(named: "photo-image"))
-
         
         let message = jsqMessages[indexPath.item]
-        
-        
+
         if String(message.senderId) == self.senderId {
             return bubbleFactory?.outgoingMessagesBubbleImage(with: UIColor.lightBlueColor());
         } else {
             return bubbleFactory?.incomingMessagesBubbleImage(with: UIColor.white);
         }
-        
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
@@ -127,7 +139,6 @@ extension ChatViewController {
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return jsqMessages.count;
     }
-    
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
@@ -147,10 +158,8 @@ extension ChatViewController {
 
         }
         
-        
         cell.textView.font = UIFont(name: "HelveticaNeue", size: 14)
-        cell.textView.textContainerInset = UIEdgeInsetsMake(12, 12, 12, 12) // This can be realized with an observer content size
-
+        cell.textView.textContainerInset = UIEdgeInsetsMake(12, 22, 12, 22) //! This can be realized with an observer content size. I`m sorry
         
         return cell;
     }
@@ -166,4 +175,13 @@ extension ChatViewController {
         return superSize
     }
     
+    //MARK: - Instead UITapGestureRecognizer
+
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, didTapMessageBubbleAt indexPath: IndexPath!) { 
+        self.view.endEditing(true)
+    }
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, didTapCellAt indexPath: IndexPath!, touchLocation: CGPoint) {
+        self.view.endEditing(true)
+    }
 }
