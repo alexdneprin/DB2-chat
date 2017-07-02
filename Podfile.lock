@@ -1,0 +1,28 @@
+PODS:
+  - Alamofire (4.5.0)
+  - AlamofireImage (3.2.0):
+    - Alamofire (~> 4.1)
+  - BetterSegmentedControl (0.8)
+  - JSQMessagesViewController (7.3.4):
+    - JSQSystemSoundPlayer (~> 2.0.1)
+  - JSQSystemSoundPlayer (2.0.1)
+  - SWTableViewCell (0.3.7)
+
+DEPENDENCIES:
+  - Alamofire
+  - AlamofireImage
+  - BetterSegmentedControl
+  - JSQMessagesViewController
+  - SWTableViewCell
+
+SPEC CHECKSUMS:
+  Alamofire: f28cdffd29de33a7bfa022cbd63ae95a27fae140
+  AlamofireImage: 157ed682cc81d3b9db4fb90c1f12180ac552d93b
+  BetterSegmentedControl: 9194e20687a02dd498a4e542cf523bdd8620fcb7
+  JSQMessagesViewController: 39fed975e3c9f8eba7292071e29eeb541d105e66
+  JSQSystemSoundPlayer: c5850e77a4363ffd374cd851154b9af93264ed8d
+  SWTableViewCell: 2a94aadc9d47b2b611fa064566bf57948b95b579
+
+PODFILE CHECKSUM: a11ddbb894d54978a157ca1646c2cad04d65e9cd
+
+COCOAPODS: 1.2.1

@@ -1,0 +1,6 @@
+framework module Pods_DB2_chat {
+  umbrella header "Pods-DB2-chat-umbrella.h"
+
+  export *
+  module * { export * }
+}
